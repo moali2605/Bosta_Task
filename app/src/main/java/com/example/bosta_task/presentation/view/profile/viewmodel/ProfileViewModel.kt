@@ -2,7 +2,7 @@ package com.example.bosta_task.presentation.view.profile.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bosta_task.domain.usecase.UseCaseImp
+import com.example.bosta_task.domain.usecase.ProfileUseCase
 import com.example.bosta_task.presentation.mapper.toAlbumUiDto
 import com.example.bosta_task.presentation.mapper.toUserUiDto
 import com.example.bosta_task.presentation.view.profile.view.ProfileState
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(private val useCase: UseCaseImp) : ViewModel() {
+class ProfileViewModel @Inject constructor(private val useCase: ProfileUseCase) : ViewModel() {
 
 
     private val _profileState: MutableStateFlow<ProfileState.Display> =

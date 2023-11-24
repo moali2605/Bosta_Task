@@ -2,7 +2,7 @@ package com.example.bosta_task.presentation.view.album.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bosta_task.domain.usecase.UseCaseImp
+import com.example.bosta_task.domain.usecase.AlbumUseCase
 import com.example.bosta_task.presentation.mapper.toPhotoUiDto
 import com.example.bosta_task.presentation.view.album.view.AlbumState
 import com.example.bosta_task.util.Response
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AlbumDetailsViewModel @Inject constructor(private val useCase: UseCaseImp) : ViewModel() {
+class AlbumDetailsViewModel @Inject constructor(private val useCase: AlbumUseCase) : ViewModel() {
     private val _albumState: MutableStateFlow<AlbumState.Display> =
         MutableStateFlow(AlbumState.Display())
     val albumState = _albumState.asStateFlow()

@@ -5,7 +5,8 @@ import com.example.bosta_task.data.remote_source.RemoteSourceInterface
 import com.example.bosta_task.data.remote_source.RetrofitInterface
 import com.example.bosta_task.data.repo.Repository
 import com.example.bosta_task.domain.repo.RepositoryInterface
-import com.example.bosta_task.domain.usecase.UseCaseImp
+import com.example.bosta_task.domain.usecase.AlbumUseCase
+import com.example.bosta_task.domain.usecase.ProfileUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -51,12 +52,6 @@ abstract class AppModule {
                 )
                 .baseUrl(baseUrl)
                 .build().create(RetrofitInterface::class.java)
-        }
-
-        @Provides
-        @Singleton
-        fun provideUseCase(repository: RepositoryInterface): UseCaseImp {
-            return UseCaseImp(repository)
         }
     }
 
