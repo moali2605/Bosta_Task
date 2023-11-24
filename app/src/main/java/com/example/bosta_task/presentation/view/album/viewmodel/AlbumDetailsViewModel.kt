@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bosta_task.domain.usecase.UseCaseImp
 import com.example.bosta_task.presentation.mapper.toPhotoUiDto
-import com.example.bosta_task.presentation.view.profile.viewmodel.ProfileState
+import com.example.bosta_task.presentation.view.album.view.AlbumState
 import com.example.bosta_task.util.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +22,9 @@ class AlbumDetailsViewModel @Inject constructor(private val useCase: UseCaseImp)
     private val _albumState: MutableStateFlow<AlbumState.Display> =
         MutableStateFlow(AlbumState.Display())
     val albumState = _albumState.asStateFlow()
-    private val _errorState: MutableSharedFlow<ProfileState.Failure> = MutableSharedFlow()
+    private val _errorState: MutableSharedFlow<AlbumState.Failure> = MutableSharedFlow()
     val errorState = _errorState.asSharedFlow()
+
 
     fun getPhotoByAlbumId(id: String) {
         _albumState.update {
@@ -50,7 +51,7 @@ class AlbumDetailsViewModel @Inject constructor(private val useCase: UseCaseImp)
 
                     is Response.Failure -> {
                         response.error?.let { errorMessage ->
-                            _errorState.emit(ProfileState.Failure(errorMessage))
+                            _errorState.emit(AlbumState.Failure(errorMessage))
                         }
                         _albumState.update { it.copy(loading = false) }
                     }

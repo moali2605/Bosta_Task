@@ -1,4 +1,4 @@
-package com.example.bosta_task.presentation.view.album.viewmodel
+package com.example.bosta_task.presentation.view.album.view
 
 import com.example.bosta_task.presentation.model.PhotoUiDto
 

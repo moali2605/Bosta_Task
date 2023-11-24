@@ -37,16 +37,19 @@ abstract class AppModule {
                 .build()
         }
 
+        @Provides
+        @Singleton
+        fun provideUrl(): String = "https://jsonplaceholder.typicode.com"
 
         @Provides
         @Singleton
-        fun provideApi(okHttpClient: OkHttpClient): RetrofitInterface {
+        fun provideApi(okHttpClient: OkHttpClient, baseUrl: String): RetrofitInterface {
             return Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient)
                 .addConverterFactory(
                     GsonConverterFactory.create()
                 )
-                .baseUrl("https://jsonplaceholder.typicode.com/")
+                .baseUrl(baseUrl)
                 .build().create(RetrofitInterface::class.java)
         }
 

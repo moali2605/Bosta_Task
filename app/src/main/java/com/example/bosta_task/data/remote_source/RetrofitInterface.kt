@@ -8,12 +8,18 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RetrofitInterface {
-    @GET("/users/{UserId}")
+    companion object {
+        const val USERS_ENDPOINT = "/users"
+        const val ALBUMS_ENDPOINT = "/albums"
+        const val PHOTOS_ENDPOINT = "/photos"
+    }
+
+    @GET("$USERS_ENDPOINT/{UserId}")
     suspend fun getUserById(@Path("UserId") id: String): UserDto
 
-    @GET("/albums")
+    @GET(ALBUMS_ENDPOINT)
     suspend fun getAlbumByUserId(@Query("userId") id: String): AlbumResponse
 
-    @GET("/photos")
+    @GET(PHOTOS_ENDPOINT)
     suspend fun getPhotoByAlbumId(@Query("albumId") id: String): PhotoResponse
 }

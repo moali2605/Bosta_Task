@@ -23,6 +23,7 @@ class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
     private val profileViewModel by viewModels<ProfileViewModel>()
     private lateinit var albumAdapter: AlbumAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,7 +34,11 @@ class ProfileFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initViews()
+        initObservers()
+    }
 
+    private fun initViews() {
         albumAdapter = AlbumAdapter {
             val action = ProfileFragmentDirections.actionProfileFragmentToAlbumDetailsFragment2(it)
             findNavController().navigate(action)
@@ -42,36 +47,47 @@ class ProfileFragment : Fragment() {
             adapter = albumAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+    }
 
-        lifecycleScope.launch {
+    private fun initObservers() {
+        viewLifecycleOwner.lifecycleScope.launch {
             profileViewModel.getUserById()
             profileViewModel.profileState.collectLatest { profileState ->
                 if (profileState.loading) {
-                    binding.apply {
-                        loading.visibility = View.VISIBLE
-                        loading.setAnimation(R.raw.loading)
-                        textView4.visibility = View.GONE
-                        textView6.visibility = View.GONE
-                    }
-                    Toast.makeText(requireContext(), "loading", Toast.LENGTH_SHORT).show()
+                    showLoadingState()
                 } else {
-                    binding.apply {
-                        loading.visibility = View.GONE
-                        textView4.visibility = View.VISIBLE
-                        textView6.visibility = View.VISIBLE
-                        binding.tvName.text = profileState.userUiDto.name
-                        binding.tvAddress.text =
-                            "${profileState.userUiDto.address.city},${profileState.userUiDto.address.suite}, ${profileState.userUiDto.address.street}, ${profileState.userUiDto.address.zipcode}"
-                    }
-                    albumAdapter.submitList(profileState.albums)
+                    populateUi(profileState)
                 }
             }
             profileViewModel.errorState.collect {
-                Toast.makeText(requireContext(), it.errorMsg, Toast.LENGTH_SHORT).show()
+                showErrorState(it)
             }
         }
-
     }
 
+    private fun showLoadingState() {
+        binding.apply {
+            loading.visibility = View.VISIBLE
+            loading.setAnimation(R.raw.loading)
+            textView4.visibility = View.GONE
+            textView6.visibility = View.GONE
+        }
+        Toast.makeText(requireContext(), "loading", Toast.LENGTH_SHORT).show()
+    }
 
+    private fun populateUi(profileState: ProfileState.Display) {
+        binding.apply {
+            loading.visibility = View.GONE
+            textView4.visibility = View.VISIBLE
+            textView6.visibility = View.VISIBLE
+            tvName.text = profileState.userUiDto.name
+            tvAddress.text =
+                "${profileState.userUiDto.address.city},${profileState.userUiDto.address.suite}, ${profileState.userUiDto.address.street}, ${profileState.userUiDto.address.zipcode}"
+        }
+        albumAdapter.submitList(profileState.albums)
+    }
+
+    private fun showErrorState(errorState: ProfileState.Failure) {
+        Toast.makeText(requireContext(), errorState.errorMsg, Toast.LENGTH_SHORT).show()
+    }
 }

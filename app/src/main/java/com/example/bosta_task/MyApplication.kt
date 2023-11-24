@@ -1,7 +1,7 @@
-package com.example.bosta_task.di
+package com.example.bosta_task
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class MyApplication : Application()
+class MyApplication:Application()

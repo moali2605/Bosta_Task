@@ -1,4 +1,4 @@
-package com.example.bosta_task.presentation.view.profile.viewmodel
+package com.example.bosta_task.presentation.view.profile.view
 
 import com.example.bosta_task.presentation.model.album.AlbumUiDto
 import com.example.bosta_task.presentation.model.user.AddressUiDto

@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bosta_task.R
 import com.example.bosta_task.databinding.FragmentAlbumDetailsBinding
 import com.example.bosta_task.presentation.view.album.viewmodel.AlbumDetailsViewModel
-import com.example.bosta_task.presentation.view.profile.view.ProfileFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -24,6 +23,7 @@ class AlbumDetailsFragment : Fragment() {
     private lateinit var binding: FragmentAlbumDetailsBinding
     private val albumViewModel by viewModels<AlbumDetailsViewModel>()
     private lateinit var photosAdapter: PhotosAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,7 +33,15 @@ class AlbumDetailsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val album = AlbumDetailsFragmentArgs.fromBundle(requireArguments()).album
+        albumViewModel.getPhotoByAlbumId(album.id.toString())
+        binding.tvAlbumDetailsName.text = album.title
+        bindViews()
+        initListeners()
+        initObserver()
+    }
 
+    private fun bindViews() {
         photosAdapter = PhotosAdapter(requireContext()) {
             val action =
                 AlbumDetailsFragmentDirections.actionAlbumDetailsFragmentToPhotoViewerFragment(it)
@@ -47,38 +55,52 @@ class AlbumDetailsFragment : Fragment() {
         binding.btnDetailBack.setOnClickListener {
             findNavController().popBackStack()
         }
-        val album = AlbumDetailsFragmentArgs.fromBundle(requireArguments()).album
-        binding.tvAlbumDetailsName.text = album.title
-        albumViewModel.getPhotoByAlbumId(album.id.toString())
-        lifecycleScope.launch {
+    }
+
+    private fun initListeners() {
+
+        binding.tfSearch.doOnTextChanged { text, _, _, _ ->
+            albumViewModel.searchByTitle(text.toString())
+            photosAdapter.submitList(albumViewModel.albumState.value.filteredPhotos)
+            if (text.toString().isBlank()) {
+                photosAdapter.submitList(albumViewModel.albumState.value.photoUiDto)
+            }
+        }
+    }
+
+    private fun initObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
             albumViewModel.albumState.collectLatest { albumState ->
                 if (albumState.loading) {
-                    binding.apply {
-                        loadingPhotos.visibility = View.VISIBLE
-                        loadingPhotos.setAnimation(R.raw.loading)
-                        textField2.visibility = View.GONE
-                    }
+                    showLoadingState()
                 } else {
-                    binding.apply {
-                        loadingPhotos.visibility = View.GONE
-                        textField2.visibility = View.VISIBLE
-                    }
-
-                    photosAdapter.submitList(albumState.photoUiDto)
-                    binding.tfSearch.doOnTextChanged { text, _, _, _ ->
-                        albumViewModel.searchByTitle(text.toString())
-                        photosAdapter.submitList(albumState.filteredPhotos)
-                        if (text.toString().isBlank()) {
-                            photosAdapter.submitList(albumState.photoUiDto)
-                        }
-
-                    }
-
+                    showDataState(albumState)
                 }
             }
             albumViewModel.errorState.collect {
-                Toast.makeText(requireContext(), it.errorMsg, Toast.LENGTH_SHORT).show()
+                showErrorState(it)
             }
         }
+    }
+
+    private fun showLoadingState() {
+        binding.apply {
+            loadingPhotos.visibility = View.VISIBLE
+            loadingPhotos.setAnimation(R.raw.loading)
+            textField2.visibility = View.GONE
+        }
+    }
+
+    private fun showDataState(albumState: AlbumState.Display) {
+        binding.apply {
+            loadingPhotos.visibility = View.GONE
+            textField2.visibility = View.VISIBLE
+        }
+
+        photosAdapter.submitList(albumState.filteredPhotos)
+    }
+
+    private fun showErrorState(errorState: AlbumState.Failure) {
+        Toast.makeText(requireContext(), errorState.errorMsg, Toast.LENGTH_SHORT).show()
     }
 }

@@ -15,12 +15,12 @@ import com.bumptech.glide.Glide
 import com.example.bosta_task.R
 import com.example.bosta_task.databinding.FragmentPhotoViewerBinding
 
-
 class PhotoViewerFragment : Fragment() {
     private lateinit var binding: FragmentPhotoViewerBinding
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private lateinit var gestureDetector: GestureDetector
     private var scaleFactor = 1.0f
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,13 +31,19 @@ class PhotoViewerFragment : Fragment() {
 
     @SuppressLint("QueryPermissionsNeeded", "ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initUi()
         setGesturesListeners()
+    }
+
+    @SuppressLint("ClickableViewAccessibility", "QueryPermissionsNeeded")
+    private fun initUi() {
         val photo = PhotoViewerFragmentArgs.fromBundle(requireArguments()).photo
         Glide.with(requireContext())
             .load(photo.url)
             .placeholder(R.drawable.reload)
             .error(R.drawable.reload)
             .into(binding.ivPhoto)
+
         binding.apply {
             tvPhotoName.text = photo.title
             backBtn.setOnClickListener {
@@ -74,7 +80,6 @@ class PhotoViewerFragment : Fragment() {
                     binding.ivPhoto.scaleY = scaleFactor
                     return true
                 }
-
             })
 
         scaleGestureDetector = ScaleGestureDetector(
